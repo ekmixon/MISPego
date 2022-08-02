@@ -60,22 +60,22 @@ class MaltegoEntity(object):
 			self.iconURL = iU;
 
 	def returnEntity(self):
-		print("<Entity Type=\"" + str(self.entityType) + "\">");
-		print("<Value>" + str(self.value) + "</Value>");
-		print("<Weight>" + str(self.weight) + "</Weight>");
-		if (self.displayInformation is not None):
-			print("<DisplayInformation><Label Name=\"\" Type=\"text/html\"><![CDATA[" + str(self.displayInformation) + "]]></Label></DisplayInformation>");
-		if (len(self.additionalFields) > 0):
-			print("<AdditionalFields>");
-			for i in range(len(self.additionalFields)):
-				if (str(self.additionalFields[i][2]) != "strict"):
-					print("<Field Name=\"" + str(u2a_ascii(self.additionalFields[i][0])) + "\" DisplayName=\"" + str(u2a_ascii(self.additionalFields[i][1])) + "\">" + str(u2a_ascii(self.additionalFields[i][3])) + "</Field>");
-				else:
-					print("<Field MatchingRule=\"" + str(u2a_ascii(self.additionalFields[i][2])) + "\" Name=\"" + str(u2a_ascii(self.additionalFields[i][0])) + "\" DisplayName=\"" + str(u2a_ascii(self.additionalFields[i][1])) + "\">" + str(u2a_ascii(self.additionalFields[i][3])) + "</Field>");
-			print("</AdditionalFields>");
-		if (len(self.iconURL) > 0):
-			print("<IconURL>" + self.iconURL + "</IconURL>");
-		print("</Entity>");
+	    print("<Entity Type=\"" + str(self.entityType) + "\">");
+	    print(f"<Value>{str(self.value)}</Value>");
+	    print(f"<Weight>{str(self.weight)}</Weight>");
+	    if (self.displayInformation is not None):
+	    	print("<DisplayInformation><Label Name=\"\" Type=\"text/html\"><![CDATA[" + str(self.displayInformation) + "]]></Label></DisplayInformation>");
+	    if (len(self.additionalFields) > 0):
+	    	print("<AdditionalFields>");
+	    	for i in range(len(self.additionalFields)):
+	    		if (str(self.additionalFields[i][2]) != "strict"):
+	    			print("<Field Name=\"" + str(u2a_ascii(self.additionalFields[i][0])) + "\" DisplayName=\"" + str(u2a_ascii(self.additionalFields[i][1])) + "\">" + str(u2a_ascii(self.additionalFields[i][3])) + "</Field>");
+	    		else:
+	    			print("<Field MatchingRule=\"" + str(u2a_ascii(self.additionalFields[i][2])) + "\" Name=\"" + str(u2a_ascii(self.additionalFields[i][0])) + "\" DisplayName=\"" + str(u2a_ascii(self.additionalFields[i][1])) + "\">" + str(u2a_ascii(self.additionalFields[i][3])) + "</Field>");
+	    	print("</AdditionalFields>");
+	    if (len(self.iconURL) > 0):
+	        print(f"<IconURL>{self.iconURL}</IconURL>");
+	    print("</Entity>");
 
 class MaltegoTransform(object):
 	entities = []
@@ -88,25 +88,23 @@ class MaltegoTransform(object):
 		value = None;
 
 	def parseArguments(self,argv):
-		if (argv[1] is not None):
-			self.value = argv[1];
+	    if (argv[1] is not None):
+	    	self.value = argv[1];
 
-		if (len(argv) > 2):
-			if (argv[2] is not None):
-				vars = argv[2].split('#');
-				for x in range(0,len(vars)):
-					vars_values = vars[x].split('=')
-					if (len(vars_values) == 2):
-						self.values[vars_values[0]] = vars_values[1];
+	    if (len(argv) > 2) and (argv[2] is not None):
+	        vars = argv[2].split('#');
+	        for x in range(len(vars)):
+	            vars_values = vars[x].split('=')
+	            if (len(vars_values) == 2):
+	            	self.values[vars_values[0]] = vars_values[1];
 
 	def getValue(self):
 		if (self.value is not None):
 			return self.value;
 
 	def getVar(self,varName):
-		if (varName in self.values.keys()):
-			if (self.values[varName] is not None):
-				return self.values[varName];
+	    if (varName in self.values.keys()) and (self.values[varName] is not None):
+	        return self.values[varName];
 
 	def addEntity(self,enType,enValue):
 		me = MaltegoEntity(enType,enValue);
@@ -123,16 +121,16 @@ class MaltegoTransform(object):
 		self.exceptions.append(exceptionString);
 
 	def throwExceptions(self):
-		print("<MaltegoMessage>");
-		print("<MaltegoTransformExceptionMessage>");
-		print("<Exceptions>")
+	    print("<MaltegoMessage>");
+	    print("<MaltegoTransformExceptionMessage>");
+	    print("<Exceptions>")
 
-		for i in range(len(self.exceptions)):
-			print("<Exception>" + self.exceptions[i] + "</Exception>");
-		print("</Exceptions>")
-		print("</MaltegoTransformExceptionMessage>");
-		print("</MaltegoMessage>");
-		exit();
+	    for i in range(len(self.exceptions)):
+	        print(f"<Exception>{self.exceptions[i]}</Exception>");
+	    print("</Exceptions>")
+	    print("</MaltegoTransformExceptionMessage>");
+	    print("</MaltegoMessage>");
+	    exit();
 
 	def returnOutput(self):
 		print("<MaltegoMessage>");
@@ -158,17 +156,17 @@ class MaltegoTransform(object):
 		self.writeSTDERR("+");
 
 	def progress(self,percent):
-		self.writeSTDERR("%" + str(percent));
+	    self.writeSTDERR(f"%{str(percent)}");
 
 	def debug(self,msg):
-		self.writeSTDERR("D:" + str(msg));
+	    self.writeSTDERR(f"D:{str(msg)}");
 
 
 
 def sanitise(value):
-	replace_these = ["&",">","<"];
-	replace_with = ["&amp;","&gt;","&lt;"];
-	tempvalue = value;
-	for i in range(0,len(replace_these)):
-		tempvalue = tempvalue.replace(replace_these[i],replace_with[i]);
-	return tempvalue;
+    replace_these = ["&",">","<"];
+    replace_with = ["&amp;","&gt;","&lt;"];
+    tempvalue = value;
+    for i in range(len(replace_these)):
+        tempvalue = tempvalue.replace(replace_these[i],replace_with[i]);
+    return tempvalue;

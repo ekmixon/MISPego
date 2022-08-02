@@ -20,8 +20,11 @@ try:
     misp =  PyMISP(BASE_URL, API_KEY, MISP_VERIFYCERT, 'json', MISP_DEBUG)
 except Exception as e:
     mt = MaltegoTransform()
-    mt.addException("[Error] Cannot connect to MISP instance using %s with API key %s. Please check and try again" % (BASE_URL, API_KEY))
-    mt.addException("[Error] %s" % e)
+    mt.addException(
+        f"[Error] Cannot connect to MISP instance using {BASE_URL} with API key {API_KEY}. Please check and try again"
+    )
+
+    mt.addException(f"[Error] {e}")
     mt.throwExceptions()
 
 eventDB = "event.db"
@@ -91,12 +94,12 @@ def addHash(hashValue):
         mispAttribute.value = hashValue
         misp.add_attribute(eid, mispAttribute)
     else:
-        returnFailure("hash", hashValue, "length of %s" % len(hashValue))
-    returnSuccess("%s hash" % hashType,hashValue,eid)
+        returnFailure("hash", hashValue, f"length of {len(hashValue)}")
+    returnSuccess(f"{hashType} hash", hashValue, eid)
 
 def createEvent(eventName):
     mt = MaltegoTransform()
-    mt.addUIMessage("[Info] Creating event with the name %s" % eventName)
+    mt.addUIMessage(f"[Info] Creating event with the name {eventName}")
 
     mispevent = MISPEvent()
     mispevent.analysis = MISP_ANALYSIS
@@ -112,24 +115,27 @@ def createEvent(eventName):
     einfo = event['Event']['info']
     eorgc = event['Event']['orgc_id']
     me = MaltegoEntity('maltego.MISPEvent',eid);
-    me.addAdditionalFields('EventLink', 'EventLink', False, BASE_URL + '/events/view/' + eid )
+    me.addAdditionalFields(
+        'EventLink', 'EventLink', False, f'{BASE_URL}/events/view/{eid}'
+    )
+
     me.addAdditionalFields('Org', 'Org', False, eorgc)
-    me.addAdditionalFields('notes', 'notes', False, eorgc + ": " + einfo)
+    me.addAdditionalFields('notes', 'notes', False, f"{eorgc}: {einfo}")
     mt.addEntityToMessage(me);
     returnSuccess("event", eid, None, mt)
 
 def selectEvent(eventID):
     s = shelve.open(eventDB)
     s['id'] = eventID
-    s['age'] = datetime.today()
+    s['age'] = datetime.now()
     s.close()
     mt = MaltegoTransform()
-    mt.addUIMessage("[Info] Event with ID %s selected for insert" % eventID)
+    mt.addUIMessage(f"[Info] Event with ID {eventID} selected for insert")
     mt.returnOutput()
 
 def dataError(request):
     mt = MaltegoTransform()
-    mt.addException("[Error] Failure to load function with name %s" % request)
+    mt.addException(f"[Error] Failure to load function with name {request}")
     mt.throwExceptions()
 
 def checkAge():
@@ -153,9 +159,12 @@ def returnSuccess(etype,value,event=None, mt=None):
     if not mt:
         mt = MaltegoTransform()
     if event:
-        mt.addUIMessage("[Info] Successful entry of %s with value %s into event %s" % (etype, value, event))
+        mt.addUIMessage(
+            f"[Info] Successful entry of {etype} with value {value} into event {event}"
+        )
+
     else:
-        mt.addUIMessage("[Info] Successful entry of %s with ID %s" % (etype, value))
+        mt.addUIMessage(f"[Info] Successful entry of {etype} with ID {value}")
     mt.returnOutput()
 
 def returnFailure(etype, value, reason):
